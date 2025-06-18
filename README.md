@@ -1,10 +1,13 @@
-# Russian Roulette (JRR)
+### Russian Roulette (JRR)
 A JDK 7.0 compatible multiplayer (i hope) game made by me!
 
+# Requirements
+1. Java JRE 7.0 or above ([link](https://www.oracle.com/br/java/technologies/downloads/))
+
 # How 2 Start Match?
-Start a RAdmin VPN, Hamachi or any LAN server service (both are not tested, send me feedback!).
-Its recommended you and other players to use the same LAN server service, only ensure that!
-If you receive a "Lost Connection" error, check if the server is started-up.
+Start a RAdmin VPN, Hamachi or any LAN server service (both are untested, send me feedback!).
+Its recommended that you and other players to use the same LAN server service.
+If you receive a "Lost Connection" error, ensure that the server is started-up.
 Its normal if you does not receive text when run the **GameClient**, i'll fix this.
 
 # Commands
@@ -29,8 +32,6 @@ To send a message on the chat that have no moderation (!):
 ```
 
 # How 2 Build From Source?
-Before of all, you need to have the [JDK 7.0 or above](https://www.oracle.com/br/java/technologies/downloads/), its not recommended to use versions behind this.
-
 You can build from source by running simply:
 
 ```sh
