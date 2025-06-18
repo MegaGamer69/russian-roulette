@@ -156,13 +156,13 @@ public class Game
 						synchronized(players)
 						{
 							String targetUsername = userInput.substring(6);
-							Player targetPlayer = null
+							Player targetPlayer = null;
 							
 							for(Player p : players)
 							{
-								if(p.getUsername().equalsIgnoreCase(target))
+								if(p.getUsername().equalsIgnoreCase(targetUsername))
 								{
-									target = p;
+									targetPlayer = p;
 									
 									break;
 								}
@@ -176,7 +176,7 @@ public class Game
 							{
 								unicast(player, "Você não está com o revólver.");
 							}
-							else if(target.isDeadOn())
+							else if(targetPlayer.isDeadOn())
 							{
 								unicast(player, "O alvo solicitado está morto.");
 							}
@@ -311,6 +311,11 @@ class Player
 		haveRevolver = false;
 	}
 	
+	public boolean isDeadOn()
+	{
+		return(isDead);
+	}
+	
 	public void pickRevolver()
 	{
 		if(isDead)
@@ -345,4 +350,3 @@ class Player
 		this.haveRevolver = value;
 	}
 }
-
