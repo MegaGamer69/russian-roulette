@@ -17,13 +17,19 @@ You can run commands, that includes:
 Pick the revolver if no one picked it:
 
 ```
-/PickRevolver
+/Pick
 ```
 
 Fire with the revolver if you are with it:
 
 ```
-/FireRevolver
+/Fire <player username here>
+```
+
+To pass the revolver to other player:
+
+```
+/Pass <player username here>
 ```
 
 To send a message on the chat that have no moderation (!):
