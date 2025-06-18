@@ -39,13 +39,13 @@ You can build from source by running simply:
 javac ./*.java
 ```
 
-And start the server:
+Launch the server:
 
 ```sh
 java Game
 ```
 
-Client connect via:
+Clients connect via:
 ```sh
 java GameClient
 ```
