@@ -2,10 +2,11 @@
 A JDK 7.0 compatible multiplayer (i hope) game made by me!
 
 # Requirements
-1. Java JRE 7.0 or above ([link](https://www.oracle.com/br/java/technologies/downloads/))
+1. Java JRE 7.0 or above ([link](https://www.oracle.com/br/java/technologies/downloads/));
+2. LAN/VPN server service (e.g.: Hamachi or Radmin VPN);
 
 # How 2 Start Match?
-Start a RAdmin VPN, Hamachi or any LAN server service (both are untested, send me feedback!).
+Start your server on the LAN service (untested).
 Its recommended that you and other players to use the same LAN server service.
 If you receive a "Lost Connection" error, ensure that the server is started-up.
 Its normal if you does not receive text when run the **GameClient**, i'll fix this.
@@ -38,14 +39,13 @@ You can build from source by running simply:
 javac ./*.java
 ```
 
-And run by running:
+And start the server:
 
-Server:
 ```sh
 java Game
 ```
 
-Client:
+Client connect via:
 ```sh
 java GameClient
 ```
