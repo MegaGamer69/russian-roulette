@@ -43,10 +43,6 @@ public class GameClient
 				printWriter.println(input);
 			}
 		}
-		catch(UnknownHostException exception)
-		{
-			exception.printStackTrace();
-		}
 		catch(IOException exception)
 		{
 			exception.printStackTrace();
