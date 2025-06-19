@@ -102,7 +102,7 @@ public class Game
 						break;
 					}
 					
-					if(player.isDeadO())
+					if(player.isDeadOn())
 					{
 						break;
 					}
@@ -159,6 +159,10 @@ public class Game
 										continue;
 									}
 								}
+							}
+							else
+							{
+								unicast(player, "Você não está com o revólver.");
 							}
 						}
 					}
@@ -233,6 +237,18 @@ public class Game
 							Game.unicast(player, "Não pode girar o tambor agora.");
 						}
 					}
+					else if("/Drop".equals(userInput))
+					{
+						if(player.haveRevolverOn())
+						{
+							player.setRevolverOn(false);
+							Game.broadcast(player.getUsername() + " largou o revólver.");
+						}
+						else
+						{
+							Game.unicast(player, "Você não está com o revólver.");
+						}
+					}
 				}
 			}
 			catch(IOException exception)
@@ -291,7 +307,7 @@ class Revolver
 	
 	public synchronized boolean cheatBullet(Player player)
 	{
-		int position = currentBullet + 1;
+		int position = (currentBullet + 1) % bullets.length;
 		
 		if(player.haveRevolverOn())
 		{
@@ -318,6 +334,22 @@ class Revolver
 		
 		boolean fired = bullets[currentBullet];
 		
+		if(bulletAmount <= 0)
+		{
+			Game.broadcast("Sem balas, recarregando e largando.");
+			
+			for(int i = 0; i < 2; i++)
+			{
+				bullets[random.nextInt(bullets.length)] = true;
+				
+				bulletAmount++;
+			}
+			
+			player.setRevolverOn(false);
+			
+			return(false);
+		}
+		
 		if(player.haveRevolverOn())
 		{
 			if(bullets[currentBullet])
@@ -331,7 +363,17 @@ class Revolver
 			}
 			else
 			{
-				Game.broadcast(String.format("%s mirou em %s mas o revólver não atirou.", playerUsername, targetUsername));
+				if(player != target)
+				{
+					Game.broadcast(String.format("%s mirou em %s mas o revólver não atirou.", playerUsername, targetUsername));
+					player.setRevolverOn(false);
+					target.setRevolverOn(true);
+				}
+				else
+				{
+					Game.broadcast(String.format("%s mirou em sí mesmo, o revólver não atirou.", playerUsername));
+					player.setRevolverOn(false);
+				}
 			}
 		}
 		else
