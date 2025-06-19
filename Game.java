@@ -134,6 +134,8 @@ public class Game
 							if(target == null)
 							{
 								unicast(player, "Parece que o jogador solicitado não está na partida.");
+								
+								continue;
 							}
 							
 							if(player.haveRevolverOn())
@@ -196,6 +198,33 @@ public class Game
 						
 						Game.broadcast(String.format(msg, (char)(27), username, (char)(27), arg));
 					}
+					else if("/Spin".equals(userInput))
+					{
+						if(player.haveRevolverOn())
+						{
+							revolver.spin();
+							
+							Game.broadcast("O tambor foi girado, se preparem.");
+						}
+						else
+						{
+							Game.unicast(player, "Não pode girar o tambor agora.");
+						}
+					}
+					else if("/Cheat".equals(userInput))
+					{
+						if(player.haveRevolverOn())
+						{
+							if(revolver.getMaxCheats() > 0)
+							{
+								revolver.cheatBullet(player);
+							}
+						}
+						else
+						{
+							Game.unicast(player, "Não pode girar o tambor agora.");
+						}
+					}
 				}
 			}
 			catch(IOException exception)
@@ -223,8 +252,9 @@ class Revolver
 {
 	private Random random = new Random();
 	
+	private int maxCheats = 4;
 	private int currentBullet;
-	private boolean[] bullets = new boolean[8];
+	private boolean[] bullets = new boolean[12];
 	
 	public Revolver(int max)
 	{
@@ -234,6 +264,31 @@ class Revolver
 		{
 			bullets[random.nextInt(bullets.length)] = true;
 		}
+	}
+	
+	public synchronized void decMaxCheats(Player player)
+	{
+		this.maxCheats--;
+		
+		Game.unicast(player, "Faltam " + this.maxCheats + " trapaceadas");
+	}
+	
+	public synchronized int getMaxCheats()
+	{
+		return(maxCheats);
+	}
+	
+	public synchronized boolean cheatBullet(Player player)
+	{
+		int position = currentBullet + 1;
+		
+		Game.unicast(player, "Você abriu secretamente o tambor.");
+		Game.unicast(player, "A bala correspondente ao espaço espiado está " + (bullets[position] ? "preparada." : "vazía."));
+		player.setRevolverOn(false);
+		
+		decMaxCheats(player);
+		
+		return(this.bullets[position]);
 	}
 	
 	public synchronized boolean fire(Player player, Player target)
@@ -248,7 +303,7 @@ class Revolver
 			if(bullets[currentBullet])
 			{
 				target.kill();
-				this.spin();
+				target.setRevolverOn(false);
 			}
 			else
 			{
@@ -309,6 +364,15 @@ class Player
 			Game.broadcast(String.format("%s apertou o gatilho e morreu.", this.username));
 			Game.unicast(this, "Você apertou o gatilho e morreu.");
 			Game.removePlayer(this);
+			
+			try
+			{
+				socket.close();
+			}
+			catch(IOException exception)
+			{
+				// Faz nada.
+			}
 		}
 		else
 		{
