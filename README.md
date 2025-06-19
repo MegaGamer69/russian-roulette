@@ -38,6 +38,18 @@ To send a message on the chat that have no moderation (!):
 /Send <type your textual message here>
 ```
 
+To spin the revolver:
+
+```
+/Spin
+```
+
+To Cheat the next revolver bullet:
+
+```
+/Cheat
+```
+
 ### How 2 Build From Source?
 You can build from source by running simply:
 
