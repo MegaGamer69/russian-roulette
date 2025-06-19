@@ -6,7 +6,7 @@ public class Game
 {
 	public static ServerSocket socket;
 	
-	private static Revolver revolver = new Revolver();
+	private static Revolver revolver = new Revolver(2);
 	private static List<Player> players;
 	private static List<PrintWriter> printWriters;
 	
@@ -56,6 +56,7 @@ public class Game
 		{
 			printWriter.println("[BROAD] " + message);
 			printWriter.flush();
+			System.out.println("[SERVER]" + message);
 		}
 	}
 	
@@ -180,12 +181,18 @@ public class Game
 							{
 								unicast(player, "O alvo solicitado está morto.");
 							}
+							else
+							{
+								player.setRevolverOn(false);
+								targetPlayer.pickRevolver();
+								Game.broadcast(String.format("%s passou o revólver para %s.", player.getUsername(), targetUsername));
+							}
 						}
 					}
 					else if(userInput.startsWith("/Send "))
 					{
 						String arg = userInput.substring(6);
-						String msg = "%c[35m%s disse: %c[0m%s.";
+						String msg = "%c[35m%s disse: %c[0m%s";
 						
 						Game.broadcast(String.format(msg, (char)(27), username, (char)(27), arg));
 					}
@@ -219,11 +226,11 @@ class Revolver
 	private int currentBullet;
 	private boolean[] bullets = new boolean[8];
 	
-	public Revolver()
+	public Revolver(int max)
 	{
 		Arrays.fill(bullets, false);
 		
-		for(int i = 0; i < random.nextInt(3); i++)
+		for(int i = 0; i < max; i++)
 		{
 			bullets[random.nextInt(bullets.length)] = true;
 		}
@@ -245,7 +252,7 @@ class Revolver
 			}
 			else
 			{
-				Game.broadcast(String.format("&s mirou em %s mas revólver não atirou.", playerUsername, targetUsername));
+				Game.broadcast(String.format("%s mirou em %s mas o revólver não atirou.", playerUsername, targetUsername));
 			}
 		}
 		
@@ -350,3 +357,4 @@ class Player
 		this.haveRevolver = value;
 	}
 }
+
