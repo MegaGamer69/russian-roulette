@@ -54,10 +54,13 @@ public class Game
 	
 	public static synchronized void broadcast(String message)
 	{
-		for(PrintWriter printWriter : printWriters)
+		synchronized(printWriters)
 		{
-			printWriter.println("[BROAD] " + message);
-			printWriter.flush();
+			for(PrintWriter printWriter : printWriters)
+			{
+				printWriter.println("[BROAD] " + message);
+				printWriter.flush();
+			}
 		}
 		
 		System.out.println("[SERVER] " + message);
@@ -148,9 +151,11 @@ public class Game
 							
 							if(player.haveRevolverOn())
 							{
-								for(Player targetPlayer : players)
+								List<Player> localPlayers = new ArrayList<Player>(players);
+								
+								for(Player targetPlayer : localPlayers)
 								{
-									if(targetPlayer.getUsername().equalsIgnoreCase(target))
+									if(targetPlayer != null && targetPlayer.getUsername().equalsIgnoreCase(target))
 									{
 										revolver.fire(player, targetPlayer);
 									}
@@ -408,17 +413,17 @@ class Player
 		this.out = new PrintWriter(socket.getOutputStream(), true);
 	}
 	
-	public String getUsername()
+	public synchronized String getUsername()
 	{
 		return(this.username);
 	}
 	
-	public PrintWriter getPrintWriter()
+	public synchronized PrintWriter getPrintWriter()
 	{
 		return(this.out);
 	}
 	
-	public void kill()
+	public synchronized void kill()
 	{
 		if(isDead)
 		{
@@ -445,12 +450,12 @@ class Player
 		haveRevolver = false;
 	}
 	
-	public boolean isDeadOn()
+	public synchronized boolean isDeadOn()
 	{
 		return(isDead);
 	}
 	
-	public void pickRevolver()
+	public synchronized void pickRevolver()
 	{
 		if(isDead)
 		{
@@ -474,12 +479,12 @@ class Player
 		}
 	}
 	
-	public boolean haveRevolverOn()
+	public synchronized boolean haveRevolverOn()
 	{
 		return(haveRevolver);
 	}
 	
-	public void setRevolverOn(boolean value)
+	public synchronized void setRevolverOn(boolean value)
 	{
 		this.haveRevolver = value;
 	}
