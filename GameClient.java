@@ -7,15 +7,14 @@ public class GameClient
 	public static void main(String[] args)
 	{
 		System.out.println("Boas vindas!");
-		System.out.print("Primeiramente, nós precisamos saber o seu IP: ");
+		System.out.print("Primeiramente, nós precisamos saber o seu apelido: ");
 		
 		try
 		{
-			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-			String ip = console.readLine();
-			Socket socket = new Socket(ip, 8080);
+			Socket socket = new Socket("localhost", 8080);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 			
 			new Thread(new Runnable()
 			{
