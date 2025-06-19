@@ -24,7 +24,7 @@ public class GameClient
 				
 				if(connectionCode != 200)
 				{
-					System.err.println("Não foi possível obter a nova versão, código: " + connectionCode);
+					System.err.println("Cannot search the update, code: " + connectionCode);
 					
 					return;
 				}
@@ -44,19 +44,19 @@ public class GameClient
 				
 				if(CURRENT_VERSION.equals(latestVersion))
 				{
-					System.out.println("// ATENÇÃO: Versão atualizada.");
+					System.out.println("// WARNING: Updated.");
 				}
 				else if(versionSufix.equals("-B"))
 				{
-					System.out.println("// ATENÇÃO: Nova beta encontrada: " + latestVersion + ".");
+					System.out.println("// WARNING: New beta: " + latestVersion + ".");
 				}
 				else if(versionSufix.equals("-T"))
 				{
-					System.out.println("// ATENÇÃO: Versão de teste (" + latestVersion + "), ignore.");
+					System.out.println("// ATENÇÃO: New test version (" + latestVersion + "), ignore this.");
 				}
 				else
 				{
-					System.out.println("// ATENÇÃO: Versão mais recente estável: " + latestVersion + ".");
+					System.out.println("// ATENÇÃO: New stable version: " + latestVersion + ".");
 				}
 				
 				reader.close();
@@ -72,8 +72,8 @@ public class GameClient
 	{
 		UpdateManager.checkByUpdates();
 		
-		System.out.println("Boas vindas! Versão do jogo: " + UpdateManager.CURRENT_VERSION);
-		System.out.print("Primeiramente, nós precisamos saber o seu apelido: ");
+		System.out.println("Greatings! Version: " + UpdateManager.CURRENT_VERSION);
+		System.out.print("First of all, we need your username: ");
 		
 		try
 		{
