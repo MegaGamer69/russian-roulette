@@ -9,6 +9,7 @@ A JDK 7.0 compatible multiplayer game made by me!
 Start your server on the LAN service (untested).
 Its recommended that you and other players to use the same LAN server service.
 If you receive a "Lost Connection" error, ensure that the server is started-up.
+Start the LAN server port at 8080.
 
 ### Commands
 You can run commands, that includes:
