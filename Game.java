@@ -7,19 +7,16 @@ public class Game
 	public static ServerSocket socket;
 	
 	private static Revolver revolver = new Revolver(2);
-	private static List<Player> players;
-	private static List<PrintWriter> printWriters;
+	private static List<Player> players = Collections.synchronizedList(new ArrayList<Player>());
+	private static List<PrintWriter> printWriters = Collections.synchronizedList(new ArrayList<PrintWriter>());
 	
 	public static void main(String[] args)
 	{
-		players = Collections.synchronizedList(new ArrayList<Player>());
-		printWriters = Collections.synchronizedList(new ArrayList<PrintWriter>());
-		
 		try
 		{
-			socket = new ServerSocket(8080);
-			
 			System.out.println("Inicializando servidor na porta 8080...");
+			socket = new ServerSocket(8080);
+			System.out.println("Servidor inicializado na porta 8080 com sucesso!");
 			
 			while(true)
 			{
@@ -32,6 +29,11 @@ public class Game
 		{
 			exception.printStackTrace();
 		}
+	}
+	
+	public static synchronized ServerSocket getServerSocket()
+	{
+		return(socket);
 	}
 	
 	public static synchronized void addPlayer(Player player)
@@ -56,8 +58,9 @@ public class Game
 		{
 			printWriter.println("[BROAD] " + message);
 			printWriter.flush();
-			System.out.println("[SERVER]" + message);
 		}
+		
+		System.out.println("[SERVER] " + message);
 	}
 	
 	public static synchronized void unicast(Player player, String message)
@@ -95,6 +98,11 @@ public class Game
 					String userInput = in.readLine();
 					
 					if(userInput == null)
+					{
+						break;
+					}
+					
+					if(player.isDeadO())
 					{
 						break;
 					}
@@ -252,8 +260,9 @@ class Revolver
 {
 	private Random random = new Random();
 	
-	private int maxCheats = 4;
+	private int maxCheats = 3;
 	private int currentBullet;
+	private int bulletAmount;
 	private boolean[] bullets = new boolean[6];
 	
 	public Revolver(int max)
@@ -263,6 +272,8 @@ class Revolver
 		for(int i = 0; i < max; i++)
 		{
 			bullets[random.nextInt(bullets.length)] = true;
+			
+			bulletAmount++;
 		}
 	}
 	
@@ -280,15 +291,24 @@ class Revolver
 	
 	public synchronized boolean cheatBullet(Player player)
 	{
-		int position = (currentBullet + 1) % bullets.length;
+		int position = currentBullet + 1;
 		
-		Game.unicast(player, "Você abriu secretamente o tambor.");
-		Game.unicast(player, "A bala correspondente ao espaço espiado está " + (bullets[position] ? "preparada." : "vazía."));
-		player.setRevolverOn(false);
+		if(player.haveRevolverOn())
+		{
+			Game.unicast(player, "Você abriu secretamente o tambor e vê o próximo slot após este.");
+			Game.unicast(player, "A bala correspondente ao espaço espiado está " + (bullets[position] ? "preparada." : "vazía."));
+			player.setRevolverOn(false);
+			this.decMaxCheats(player);
+			Game.broadcast(player.getUsername() + " largou o revólver.");
+			
+			return(bullets[position]);
+		}
+		else
+		{
+			Game.unicast(player, "Você não está com o revólver em mãos.");
+		}
 		
-		decMaxCheats(player);
-		
-		return(this.bullets[position]);
+		return(false);
 	}
 	
 	public synchronized boolean fire(Player player, Player target)
@@ -303,12 +323,20 @@ class Revolver
 			if(bullets[currentBullet])
 			{
 				target.kill();
-				target.setRevolverOn(false);
+				player.setRevolverOn(false);
+				
+				this.bulletAmount--;
+				
+				Game.broadcast("Restam " + bulletAmount + " balas.");
 			}
 			else
 			{
 				Game.broadcast(String.format("%s mirou em %s mas o revólver não atirou.", playerUsername, targetUsername));
 			}
+		}
+		else
+		{
+			Game.unicast(player, "Você não está com o revólver em mãos.");
 		}
 		
 		currentBullet = (currentBullet + 1) % bullets.length;
@@ -348,7 +376,7 @@ class Player
 		return(this.out);
 	}
 	
-	public synchronized void kill()
+	public void kill()
 	{
 		if(isDead)
 		{
@@ -357,26 +385,19 @@ class Player
 			return;
 		}
 		
-		if(haveRevolver)
+		isDead = true;
+		
+		Game.broadcast(String.format("%s foi atingido e morreu.", this.username));
+		Game.unicast(this, "Você foi atigindo e morreu.");
+		Game.removePlayer(this);
+		
+		try
 		{
-			isDead = true;
-			
-			Game.broadcast(String.format("%s apertou o gatilho e morreu.", this.username));
-			Game.unicast(this, "Você apertou o gatilho e morreu.");
-			Game.removePlayer(this);
-			
-			try
-			{
-				socket.close();
-			}
-			catch(IOException exception)
-			{
-				// Faz nada.
-			}
+			socket.close();
 		}
-		else
+		catch(IOException exception)
 		{
-			Game.unicast(this, "Você não está com o revólver.");
+			// Faz nada.
 		}
 		
 		haveRevolver = false;
