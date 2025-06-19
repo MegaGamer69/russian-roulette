@@ -1,5 +1,5 @@
-# Russian Roulette (JRR)
-A JDK 7.0 compatible multiplayer (i hope) game made by me!
+# Java Russian Roulette (JRR)
+A JDK 7.0 compatible multiplayer game made by me!
 
 ### Requirements
 1. Java JRE 7.0 or above ([link](https://www.oracle.com/br/java/technologies/downloads/));
@@ -22,7 +22,7 @@ Pick the revolver if no one picked it:
 Fire with the revolver if you are with it:
 
 ```
-/Fire <player username here>
+/Fire <target username here>
 ```
 
 To pass the revolver to other player:
