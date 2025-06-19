@@ -254,7 +254,7 @@ class Revolver
 	
 	private int maxCheats = 4;
 	private int currentBullet;
-	private boolean[] bullets = new boolean[12];
+	private boolean[] bullets = new boolean[6];
 	
 	public Revolver(int max)
 	{
@@ -280,7 +280,7 @@ class Revolver
 	
 	public synchronized boolean cheatBullet(Player player)
 	{
-		int position = currentBullet + 1;
+		int position = (currentBullet + 1) % bullets.length;
 		
 		Game.unicast(player, "Você abriu secretamente o tambor.");
 		Game.unicast(player, "A bala correspondente ao espaço espiado está " + (bullets[position] ? "preparada." : "vazía."));
@@ -348,7 +348,7 @@ class Player
 		return(this.out);
 	}
 	
-	public void kill()
+	public synchronized void kill()
 	{
 		if(isDead)
 		{
