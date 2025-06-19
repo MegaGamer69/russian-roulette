@@ -6,6 +6,9 @@ public class GameClient
 {
 	public static void main(String[] args)
 	{
+		System.out.println("Boas vindas!");
+		System.out.print("Precisamos saber o seu apelidio: ");
+		
 		try
 		{
 			Socket socket = new Socket("localhost", 8080);
