@@ -2,8 +2,8 @@
 A JDK 7.0 compatible multiplayer game made by me!
 
 ### Requirements
-1. Java JRE 7.0 or above ([link](https://www.oracle.com/br/java/technologies/downloads/));
-2. LAN/VPN server service (e.g.: Hamachi or Radmin VPN);
+1. Java JRE 7.0 or above ([link](https://www.oracle.com/java/technologies/downloads/));
+3. LAN/VPN server service (e.g.: Hamachi or Radmin VPN);
 
 ### How 2 Start Match?
 Start your server on the LAN service (untested).
