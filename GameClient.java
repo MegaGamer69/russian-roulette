@@ -7,10 +7,10 @@ public class GameClient
 {
 	public static class UpdateManager
 	{
-		public static final String CURRENT_VERSION = "JRR-v1.0.1-T1";
-		public static final String REPO_URL = "https://github.com/MegaGamer69/russian-roulette/releases/latest/";
+		public static final String CURRENT_VERSION = "JRR-v1.0.1-T";
+		public static final String REPO_URL = "https://api.github.com/repos/MegaGamer69/russian-roulette/releases/latest";
 		
-		public static void checkForUpdates()
+		public static void checkByUpdates()
 		{
 			try
 			{
@@ -18,6 +18,16 @@ public class GameClient
 				HttpURLConnection connection = (HttpURLConnection)(url.openConnection());
 				
 				connection.setRequestMethod("GET");
+				connection.setRequestProperty("Accept", "application/json");
+				
+				int connectionCode = connection.getResponseCode();
+				
+				if(connectionCode != 200)
+				{
+					System.err.println("Não foi possível obter a nova versão, código: " + connectionCode);
+					
+					return;
+				}
 				
 				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				StringBuilder response = new StringBuilder();
@@ -28,50 +38,40 @@ public class GameClient
 					response.append(line);
 				}
 				
-				reader.close();
-				
 				String json = response.toString();
 				String latestVersion = json.split("\"tag_name\":\"")[1].split("\"")[0];
+				String versionSufix = latestVersion.substring(7);
 				
-				if(isNewerVersion(latestVersion, CURRENT_VERSION))
+				if(CURRENT_VERSION.equals(latestVersion))
 				{
-					System.out.println("Caro jogador, encontramos uma atualização disponível.");
-					System.out.printf("Versão atual: %s, Versão nova: %s", CURRENT_VERSION, latestVersion);
+					System.out.println("// ATENÇÃO: Versão atualizada.");
 				}
+				else if(versionSufix.equals("-B"))
+				{
+					System.out.println("// ATENÇÃO: Nova beta encontrada: " + latestVersion + ".");
+				}
+				else if(versionSufix.equals("-T"))
+				{
+					System.out.println("// ATENÇÃO: Versão de teste (" + latestVersion + "), ignore.");
+				}
+				else
+				{
+					System.out.println("// ATENÇÃO: Versão mais recente estável: " + latestVersion + ".");
+				}
+				
+				reader.close();
 			}
 			catch(Exception exception)
 			{
 				exception.printStackTrace();
 			}
 		}
-		
-		private static boolean isNewerVersion(String newVersion, String currentVersion)
-		{
-			String[] newParts = newVersion.split("\\.");
-			String[] currentParts = currentVersion.split("\\.");
-			
-			for(int i = 0; i < Math.min(newParts.length, currentParts.length); i++)
-			{
-				int newPart = Integer.parseInt(newParts[i]);
-				int currentPart = Integer.parseInt(currentParts[i]);
-				
-				if(newPart > currentPart)
-				{
-					return(true);
-				}
-				
-				if(newPart < currentPart)
-				{
-					return(false);
-				}
-			}
-			
-			return(newParts.length > currentParts.length);
-		}
 	}
 	
 	public static void main(String[] args)
 	{
+		UpdateManager.checkByUpdates();
+		
 		System.out.println("Boas vindas! Versão do jogo: " + UpdateManager.CURRENT_VERSION);
 		System.out.print("Primeiramente, nós precisamos saber o seu apelido: ");
 		
