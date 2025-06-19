@@ -4,6 +4,8 @@ import java.io.*;
 
 public class Game
 {
+	public static final String CURRENT_VERSION = "JRR-v1.0.1-HF1";
+	
 	public static ServerSocket socket;
 	
 	private static Revolver revolver = new Revolver(2);
@@ -15,8 +17,11 @@ public class Game
 		try
 		{
 			System.out.println("Inicializando servidor na porta 8080...");
+			
 			socket = new ServerSocket(8080);
+			
 			System.out.println("Servidor inicializado na porta 8080 com sucesso!");
+			System.out.println("Versão: " + CURRENT_VERSION);
 			
 			while(true)
 			{
