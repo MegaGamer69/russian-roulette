@@ -16,12 +16,12 @@ public class Game
 	{
 		try
 		{
-			System.out.println("Inicializando servidor na porta 8080...");
+			System.out.println("Starting server on port 8080...");
 			
 			socket = new ServerSocket(8080);
 			
-			System.out.println("Servidor inicializado na porta 8080 com sucesso!");
-			System.out.println("Versão: " + CURRENT_VERSION);
+			System.out.println("Server started on port 8080 sucessfully!");
+			System.out.println("Version: " + CURRENT_VERSION);
 			
 			while(true)
 			{
@@ -47,8 +47,8 @@ public class Game
 		
 		String username = player.getUsername();
 		
-		broadcast(String.format("%s acaba de entrar na roleta-russa.\n", username));
-		unicast(player, String.format("Saudações, %s!\n", username));
+		broadcast(String.format("%s just entered on the JRR.\n", username));
+		unicast(player, String.format("Greatings, %s!\n", username));
 	}
 	
 	public static synchronized void removePlayer(Player player)
@@ -137,7 +137,7 @@ public class Game
 							}
 							else
 							{
-								unicast(player, "Você não pode pegar o revólver.");
+								unicast(player, "You cannot pick the revolver.");
 							}
 						}
 					}
@@ -149,7 +149,7 @@ public class Game
 							
 							if(target == null)
 							{
-								unicast(player, "Parece que o jogador solicitado não está na partida.");
+								unicast(player, "Looks like that the requested player does not exists.");
 								
 								continue;
 							}
@@ -172,7 +172,7 @@ public class Game
 							}
 							else
 							{
-								unicast(player, "Você não está com o revólver.");
+								unicast(player, "You cannot pick the revolver.");
 							}
 						}
 					}
@@ -195,21 +195,21 @@ public class Game
 							
 							if(targetPlayer == null)
 							{
-								unicast(player, "Parece que o jogador solicitado não está na partida.");
+								unicast(player, "Looks like that the requested player does not exists.");
 							}
 							else if(!player.haveRevolverOn())
 							{
-								unicast(player, "Você não está com o revólver.");
+								unicast(player, "You cannot pick the revolver.");
 							}
 							else if(targetPlayer.isDeadOn())
 							{
-								unicast(player, "O alvo solicitado está morto.");
+								unicast(player, "The requested player is already dead.");
 							}
 							else
 							{
 								player.setRevolverOn(false);
 								targetPlayer.pickRevolver();
-								Game.broadcast(String.format("%s passou o revólver para %s.", player.getUsername(), targetUsername));
+								Game.broadcast(String.format("%s passed the revolver to %s.", player.getUsername(), targetUsername));
 							}
 						}
 					}
@@ -226,11 +226,11 @@ public class Game
 						{
 							revolver.spin();
 							
-							Game.broadcast("O tambor foi girado, se preparem.");
+							Game.broadcast(String.format("%s just cycled the revolver.", username));
 						}
 						else
 						{
-							Game.unicast(player, "Não pode girar o tambor agora.");
+							Game.unicast(player, "Cannot cycle the revolver.");
 						}
 					}
 					else if("/Cheat".equals(userInput))
@@ -244,7 +244,7 @@ public class Game
 						}
 						else
 						{
-							Game.unicast(player, "Não pode girar o tambor agora.");
+							Game.unicast(player, "Cannot cheat now.");
 						}
 					}
 					else if("/Drop".equals(userInput))
@@ -252,18 +252,22 @@ public class Game
 						if(player.haveRevolverOn())
 						{
 							player.setRevolverOn(false);
-							Game.broadcast(player.getUsername() + " largou o revólver.");
+							Game.broadcast(player.getUsername() + " just dropped the revolver.");
 						}
 						else
 						{
-							Game.unicast(player, "Você não está com o revólver.");
+							unicast(player, "You cannot pick the revolver.");
 						}
+					}
+					else
+					{
+						Game.unicast(player, "Invalid command.");
 					}
 				}
 			}
 			catch(IOException exception)
 			{
-				System.out.println("Jogador desconectado");
+				System.out.println("Player disconnected.");
 			}
 			finally
 			{
@@ -275,7 +279,7 @@ public class Game
 				}
 				catch(IOException exception)
 				{
-					// Faça nada.
+					// Do nothing.
 				}
 			}
 		}
@@ -307,7 +311,7 @@ class Revolver
 	{
 		this.maxCheats--;
 		
-		Game.unicast(player, "Faltam " + this.maxCheats + " trapaceadas");
+		Game.unicast(player, "Rests " + this.maxCheats + " cheats");
 	}
 	
 	public synchronized int getMaxCheats()
@@ -321,17 +325,17 @@ class Revolver
 		
 		if(player.haveRevolverOn())
 		{
-			Game.unicast(player, "Você abriu secretamente o tambor e vê o próximo slot após este.");
-			Game.unicast(player, "A bala correspondente ao espaço espiado está " + (bullets[position] ? "preparada." : "vazía."));
+			Game.unicast(player, "You secretely opened the revolver and seen the next chamber after this.");
+			Game.unicast(player, "And this chamber is " + (bullets[position] ? "ready." : "empty."));
 			player.setRevolverOn(false);
 			this.decMaxCheats(player);
-			Game.broadcast(player.getUsername() + " largou o revólver.");
+			Game.broadcast(player.getUsername() + " dropped the revolver.");
 			
 			return(bullets[position]);
 		}
 		else
 		{
-			Game.unicast(player, "Você não está com o revólver em mãos.");
+			Game.unicast(player, "You do not have the revolver in your hands.");
 		}
 		
 		return(false);
@@ -346,7 +350,7 @@ class Revolver
 		
 		if(bulletAmount <= 0)
 		{
-			Game.broadcast("Sem balas, recarregando e largando.");
+			Game.broadcast("No bullets, recharging.");
 			
 			for(int i = 0; i < 2; i++)
 			{
@@ -369,26 +373,26 @@ class Revolver
 				
 				this.bulletAmount--;
 				
-				Game.broadcast("Restam " + bulletAmount + " balas.");
+				Game.broadcast("Rests " + bulletAmount + " bullets.");
 			}
 			else
 			{
 				if(player != target)
 				{
-					Game.broadcast(String.format("%s mirou em %s mas o revólver não atirou.", playerUsername, targetUsername));
+					Game.broadcast(String.format("%s aimed on %s but the chamber was empty.", playerUsername, targetUsername));
 					player.setRevolverOn(false);
 					target.setRevolverOn(true);
 				}
 				else
 				{
-					Game.broadcast(String.format("%s mirou em sí mesmo, o revólver não atirou.", playerUsername));
+					Game.broadcast(String.format("%s aimed himself but the chamber is empty.", playerUsername));
 					player.setRevolverOn(false);
 				}
 			}
 		}
 		else
 		{
-			Game.unicast(player, "Você não está com o revólver em mãos.");
+			Game.unicast(player, "You do not have the revolver in your hands.");
 		}
 		
 		currentBullet = (currentBullet + 1) % bullets.length;
@@ -432,15 +436,15 @@ class Player
 	{
 		if(isDead)
 		{
-			Game.unicast(this, "Você está morto.");
+			Game.unicast(this, "You are dead.");
 			
 			return;
 		}
 		
 		isDead = true;
 		
-		Game.broadcast(String.format("%s foi atingido e morreu.", this.username));
-		Game.unicast(this, "Você foi atigindo e morreu.");
+		Game.broadcast(String.format("%s got shooted and died.", this.username));
+		Game.unicast(this, "You got shooted and died.");
 		Game.removePlayer(this);
 		
 		try
@@ -464,14 +468,14 @@ class Player
 	{
 		if(isDead)
 		{
-			Game.unicast(this, "Você está morto.");
+			Game.unicast(this, "You are dead.");
 			
 			return;
 		}
 		
 		if(haveRevolver)
 		{
-			Game.unicast(this, "Você já está com o revólver.");
+			Game.unicast(this, "You already have the revolver.");
 			
 			return;
 		}
@@ -479,8 +483,8 @@ class Player
 		{
 			haveRevolver = true;
 			
-			Game.broadcast(String.format("%s pegou o revólver.", this.username));
-			Game.unicast(this, "Você pegou o revólver.");
+			Game.broadcast(String.format("%s picked the revolver.", this.username));
+			Game.unicast(this, "You picked the revolver.");
 		}
 	}
 	
