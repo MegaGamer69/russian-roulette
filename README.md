@@ -71,5 +71,3 @@ java GameClient
 ### Notes
 If you are a streamer (like Tyroz, Felipe Neto or any other)
 or content creator (like some Arena Breakout YouTubers, i love this game), send me honest feedbacks!
-
-(DeepSeek is becoming smarter for formal contexts, im experiencing this and its not bad at this but its a informal game at the current moment).
