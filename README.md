@@ -1,13 +1,13 @@
 # Java Russian Roulette (JRR)
-A JDK 7.0 compatible multiplayer game made by me!
+A multiplayer game compatible with JDK 7.0 made by me!
 
 ### Requirements
 1. Java JRE 7.0 or above ([link](https://www.oracle.com/java/technologies/downloads/));
 3. LAN/VPN server service (e.g.: Hamachi or Radmin VPN);
 
-### How 2 Start Match?
+### How 2 Start A Match?
 Start your server on the LAN service (untested).
-Its recommended that you and other players to use the same LAN server service.
+It's recommended that you and other players to use the same LAN server service.
 If you receive a "Lost Connection" error, ensure that the server is started-up.
 Start the LAN server port at 8080.
 
@@ -44,7 +44,7 @@ To spin the revolver:
 /Spin
 ```
 
-To Cheat the next revolver bullet:
+To Cheat the next revolver bullet (the next one after the current):
 
 ```
 /Cheat
