@@ -7,7 +7,7 @@ public class GameClient
 {
 	public static class UpdateManager
 	{
-		public static final String CURRENT_VERSION = "JRR-v1.0.1-T";
+		public static final String CURRENT_VERSION = "JRR-v1.0.2-B";
 		public static final String REPO_URL = "https://api.github.com/repos/MegaGamer69/russian-roulette/releases/latest";
 		
 		public static void checkByUpdates()
@@ -24,7 +24,7 @@ public class GameClient
 				
 				if(connectionCode != 200)
 				{
-					System.err.println("Cannot search the update, code: " + connectionCode);
+					System.err.println("Não pôde obter a atualização, código: " + connectionCode);
 					
 					return;
 				}
@@ -44,19 +44,15 @@ public class GameClient
 				
 				if(CURRENT_VERSION.equals(latestVersion))
 				{
-					System.out.println("// WARNING: Updated.");
+					System.out.println("// OKAY: Seu jogo está atualizado!.");
 				}
 				else if(versionSufix.equals("-B"))
 				{
-					System.out.println("// WARNING: New beta: " + latestVersion + ".");
-				}
-				else if(versionSufix.equals("-T"))
-				{
-					System.out.println("// ATENÇÃO: New test version (" + latestVersion + "), ignore this.");
+					System.out.println("// ATENÇÃO: Nova versão beta: " + latestVersion + ".");
 				}
 				else
 				{
-					System.out.println("// ATENÇÃO: New stable version: " + latestVersion + ".");
+					System.out.println("// ATENÇÃO: Nova versão estável: " + latestVersion + ".");
 				}
 				
 				reader.close();
@@ -72,8 +68,17 @@ public class GameClient
 	{
 		UpdateManager.checkByUpdates();
 		
-		System.out.println("Greatings! Version: " + UpdateManager.CURRENT_VERSION);
-		System.out.print("First of all, we need your username: ");
+		if(UpdateManager.CURRENT_VERSION.equals(Game.CURRENT_VERSION))
+		{
+			// Faça nada.
+		}
+		else
+		{
+			return;
+		}
+		
+		System.out.println("Saudações! Versão: " + UpdateManager.CURRENT_VERSION);
+		System.out.print("Escreva seu nome de usuário: ");
 		
 		try
 		{
