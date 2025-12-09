@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Game
 {
-	public static final String CURRENT_VERSION = "JRR-v1.0.2-B";
+	public static final String CURRENT_VERSION = "JRR-v1.0.2-P2";
 	
 	public static ServerSocket socket;
 	
