@@ -7,7 +7,7 @@ public class GameClient
 {
 	public static class UpdateManager
 	{
-		public static final String CURRENT_VERSION = "JRR-v1.0.2-B";
+		public static final String CURRENT_VERSION = "JRR-v1.0.2-P2";
 		public static final String REPO_URL = "https://api.github.com/repos/MegaGamer69/russian-roulette/releases/latest";
 		
 		public static void checkByUpdates()
