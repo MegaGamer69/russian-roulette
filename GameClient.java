@@ -82,7 +82,7 @@ public class GameClient
 		
 		try
 		{
-			Socket socket = new Socket("localhost", 8080);
+			Socket socket = new Socket("lo", 8080);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
