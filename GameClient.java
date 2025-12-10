@@ -5,6 +5,8 @@ import org.json.*;
 
 public class GameClient
 {
+	public static String ipAddress = "";
+	
 	public static class UpdateManager
 	{
 		public static final String CURRENT_VERSION = "JRR-v1.0.2-P2";
@@ -78,11 +80,12 @@ public class GameClient
 		}
 		
 		System.out.println("Saudações! Versão: " + UpdateManager.CURRENT_VERSION);
+		pickIPAddress();
 		System.out.print("Escreva seu nome de usuário: ");
 		
 		try
 		{
-			Socket socket = new Socket("lo", 8080);
+			Socket socket = new Socket(ipAddress, 8080);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -115,6 +118,49 @@ public class GameClient
 			}
 		}
 		catch(IOException exception)
+		{
+			exception.printStackTrace();
+		}
+	}
+	
+	private static void pickIPAddress()
+	{
+		try
+		{
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			
+			while(interfaces.hasMoreElements())
+			{
+				NetworkInterface nwInterface = interfaces.nextElement();
+				
+				if(nwInterface.isLoopback() || !nwInterface.isUp())
+				{
+					continue;
+				}
+				
+				Enumeration<InetAddress> addresses = nwInterface.getInetAddresses();
+				
+				while(addresses.hasMoreElements())
+				{
+					InetAddress address = addresses.nextElement();
+					
+					if(address instanceof java.net.Inet4Address && !address.isLoopbackAddress())
+					{
+						String ip = address.getHostAddress();
+						
+						if(ip.startsWith("192.168.") || ip.startsWith("10.") || ip.startsWith("172."))
+						{
+							ipAddress = ip;
+							
+							System.out.println(String.format("Endereço LAN de conexão detectado (IPv4: %s)!", ipAddress));
+							
+							return;
+						}
+					}
+				}
+			}
+		}
+		catch(SocketException exception)
 		{
 			exception.printStackTrace();
 		}

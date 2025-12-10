@@ -14,12 +14,6 @@ Start the LAN server port at 8080.
 ### Commands
 You can run commands, that includes:
 
-Pick the revolver (if no one picket it yet):
-
-```
-/Pick
-```
-
 Fire with the revolver (if you are with it):
 
 ```
@@ -50,12 +44,6 @@ To Cheat the next revolver bullet (the next one after the current), and again, y
 /Cheat
 ```
 
-To drop the revolver (YOU NEED TO HAVE THE REVOLVER):
-
-```
-/Drop
-```
-
 ### How 2 Build From Source?
 You can build from source by running simply:
 
@@ -76,6 +64,7 @@ java -jar Game.jar
 ```
 
 To connect as a client:
+
 ```sh
 java -jar GameClient.jar
 ```
