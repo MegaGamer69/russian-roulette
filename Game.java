@@ -13,7 +13,6 @@ public class Game
 	public static boolean started;
 	
 	private static int round;
-	private static int playerCount;
 	
 	private static Revolver revolver = new Revolver(2);
 	private static List<Player> players = Collections.synchronizedList(new ArrayList<Player>());
@@ -72,21 +71,36 @@ public class Game
 		
 		broadcast(String.format("%s entrou na partida.\n", username));
 		unicast(player, String.format("Saudações, %s!\n", username));
-		
-		playerCount++;
 	}
 	
 	public static synchronized void removePlayer(Player player)
 	{
+		int index = players.indexOf(player);
+		
 		players.remove(player);
 		printWriters.remove(player.getPrintWriter());
 		
-		playerCount--;
+		if(index < round)
+		{
+			round--;
+		}
+		
+		if(round >= players.size())
+		{
+			round = 0;
+		}
 	}
 	
 	public static synchronized void nextRound()
 	{
-		round = (round + 1) % playerCount;
+		Player player1 = players.get(round);
+		
+		if(player1.haveRevolverOn())
+		{
+			player1.dropRevolver();
+		}
+		
+		round = (round + 1) % players.size();
 		
 		players.get(round).pickRevolver();
 	}
@@ -156,6 +170,13 @@ public class Game
 				{
 					String userInput = in.readLine();
 					
+					if(userInput == null)
+					{
+						Game.unicast(player, "Sua entrada está vazia.");
+						
+						continue;
+					}
+					
 					if(!started)
 					{
 						if(userInput.startsWith("/Send "))
@@ -167,7 +188,7 @@ public class Game
 						}
 						else if("/Start".equals(userInput))
 						{
-							if(playerCount >= MIN_PLAYERS)
+							if(players.size() >= MIN_PLAYERS)
 							{
 								broadcast("Partida inicializada!");
 								Collections.shuffle(players);
@@ -210,7 +231,7 @@ public class Game
 							{
 								String target = userInput.substring(6);
 								
-								if(target == null)
+								if(target == null || target.trim().isEmpty())
 								{
 									unicast(player, "Parece que o jogador solicitado não existe.");
 									
@@ -352,7 +373,7 @@ class Revolver
 	{
 		this.maxCheats--;
 		
-		Game.unicast(player, "Restam " + this.maxCheats + " trapaças");
+		Game.unicast(player, "Restam " + this.maxCheats + " trapaças globais.");
 	}
 	
 	public synchronized int getMaxCheats()
@@ -485,7 +506,7 @@ class Player
 		
 		isDead = true;
 		
-		Game.broadcast(String.format("%s levou um tiro e morreu.", this.username));
+		Game.broadcast(String.format("%s levou um tiro e morreu.", username));
 		Game.unicast(this, "Você levou um tiro e morreu.");
 		Game.removePlayer(this);
 		
@@ -516,6 +537,29 @@ class Player
 		return(socket);
 	}
 	
+	public synchronized void dropRevolver()
+	{
+		if(isDead)
+		{
+			Game.unicast(this, "Você está morto.");
+			
+			return;
+		}
+		
+		if(!haveRevolver)
+		{
+			Game.unicast(this, "Você não possui a arma.");
+			
+			return;
+		}
+		else
+		{
+			haveRevolver = false;
+			
+			Game.broadcast(String.format("%s largou a arma.", username));
+		}
+	}
+	
 	public synchronized void pickRevolver()
 	{
 		if(isDead)
@@ -535,7 +579,7 @@ class Player
 		{
 			haveRevolver = true;
 			
-			Game.broadcast(String.format("%s pegou a arma.", this.username));
+			Game.broadcast(String.format("%s pegou a arma.", username));
 		}
 	}
 	
