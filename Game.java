@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Game
 {
-	public static final String CURRENT_VERSION = "JRR-v1.0.2-P2";
+	public static final String CURRENT_VERSION = "JRR-v1.0.3";
 	public static final int MAX_PLAYERS = 5;
 	public static final int MIN_PLAYERS = 2;
 	
@@ -42,35 +42,79 @@ public class Game
 		}
 	}
 	
+	public static synchronized List<Player> getPlayers()
+	{
+		return(Collections.unmodifiableList(players));
+	}
+	
 	public static synchronized ServerSocket getServerSocket()
 	{
 		return(socket);
 	}
 	
-	public static synchronized void addPlayer(Player player)
+	public static synchronized boolean addPlayer(Player player)
 	{
-		if(players.size() >= MAX_PLAYERS)
+		String username = player.getUsername();
+		
+		if(username.trim().isEmpty())
 		{
-			unicast(player, String.format("Esta partida encontra-se lotada (atual: %d, máximo: %d)!", players.size(), MAX_PLAYERS));
-			
 			try
 			{
+				player.getPrintWriter().println("[Local] O nome solicitado está vazio. Recusamos a conexão.");
+				player.getPrintWriter().flush();
 				player.getSocket().close();
 			}
 			catch(IOException exception)
 			{
-				exception.printStackTrace();
+				// Faça nada.
 			}
 			
-			return;
+			return(false);
+		}
+		else
+		{
+			for(Player other : players)
+			{
+				if(username.equalsIgnoreCase(other.getUsername()))
+				{
+					try
+					{
+						player.getPrintWriter().println("[Local] O nome solicitado já está em uso. Recusamos a conexão.");
+						player.getPrintWriter().flush();
+						player.getSocket().close();
+					}
+					catch(IOException exception)	
+					{
+						// Faça nada.
+					}
+					
+					return(false);
+				}
+			}
+		}
+		
+		if(players.size() >= MAX_PLAYERS)
+		{
+			try
+			{
+				player.getPrintWriter().println(String.format("[Local] Esta partida encontra-se lotada (atual: %d, máximo: %d)!", players.size(), MAX_PLAYERS));
+				player.getPrintWriter().flush();
+				player.getSocket().close();
+			}
+			catch(IOException exception)
+			{
+				// Faça nada (novamente).
+			}
+			
+			return(false);
 		}
 		
 		players.add(player);
 		
-		String username = player.getUsername();
-		
 		broadcast(String.format("%s entrou na partida.\n", username));
 		unicast(player, String.format("Saudações, %s!\n", username));
+		
+		return(true);
 	}
 	
 	public static synchronized void removePlayer(Player player)
@@ -105,6 +149,11 @@ public class Game
 		players.get(round).pickRevolver();
 	}
 	
+	public static synchronized void serverUnicast(String message)
+	{
+		System.out.println("[SERVER] " + message);
+	}
+	
 	public static synchronized void broadcast(String message)
 	{
 		synchronized(players)
@@ -119,7 +168,7 @@ public class Game
 			}
 		}
 		
-		System.out.println("[SERVER] " + message);
+		serverUnicast(message);
 	}
 	
 	public static synchronized void unicast(Player player, String message)
@@ -158,7 +207,23 @@ public class Game
 				
 				Player newPlayer = new Player(username, socket);
 				
-				addPlayer(newPlayer);
+				boolean added = addPlayer(newPlayer);
+				
+				if(!added)
+				{
+					printWriters.remove(out);
+					
+					try
+					{
+						socket.close();
+					}
+					catch(IOException exception)
+					{
+						// Faça nada.
+					}
+					
+					return;
+				}
 				
 				Player player = newPlayer;
 				
@@ -182,9 +247,8 @@ public class Game
 						if(userInput.startsWith("/Send "))
 						{
 							String arg = userInput.substring(6);
-							String msg = "%c[35m%s disse: %c[0m%s";
 							
-							broadcast(String.format(msg, (char)(27), username, (char)(27), arg));
+							broadcast(String.format("%s disse: %s", username, arg));
 						}
 						else if("/Start".equals(userInput))
 						{
@@ -271,9 +335,8 @@ public class Game
 						{
 							if(player.haveRevolverOn())
 							{
-								revolver.spin();
-								
 								broadcast(String.format("%s acaba de ciclar o tambor.", username));
+								revolver.spin();
 							}
 							else
 							{
@@ -312,7 +375,7 @@ public class Game
 							unicast(player, "/Help ou /? mostra esta lista.");
 							unicast(player, "/Fire <substitua_isto_pelo_nome_de_alguém> atira na pessoa com o nome.");
 							unicast(player, "/Spin cicle o revólver para uma câmara aleatória.");
-							unicast(player, "/Cheat espia a próxima câmara após a atual.");
+							unicast(player, "/Cheat espia a próxima câmara em relação a atual.");
 							unicast(player, "/Pass larga a arma se tiver.");
 						}
 						else
@@ -332,11 +395,6 @@ public class Game
 				
 				try
 				{
-					for(Player player : players)
-					{
-						unicast(player, "Você foi desconectado.");
-					}
-					
 					socket.close();
 				}
 				catch(IOException exception)
@@ -390,7 +448,6 @@ class Revolver
 			Game.unicast(player, "Você secretamente espiou a cápusla seguinte à próxima.");
 			Game.unicast(player, "E a câmara espiada está " + (bullets[position] ? "pronta." : "vazía."));
 			this.decMaxCheats(player);
-			Game.broadcast(player.getUsername() + " largou a arma.");
 			Game.nextRound();
 			
 			return(bullets[position]);
@@ -414,7 +471,7 @@ class Revolver
 		{
 			Game.broadcast("Sem balas, recarregando.");
 			
-			for(int i = 0; i < 1; i++)
+			for(int i = 0; i < 2; i++)
 			{
 				bullets[random.nextInt(bullets.length)] = true;
 				
@@ -480,7 +537,7 @@ class Player
 	
 	public Player(String username, Socket socket) throws IOException
 	{
-		this.username = username;
+		this.username = username.trim();
 		this.socket = socket;
 		this.out = new PrintWriter(socket.getOutputStream(), true);
 	}
@@ -499,7 +556,7 @@ class Player
 	{
 		if(isDead)
 		{
-			Game.unicast(this, "Você está morto.");
+			Game.unicast(this, "Você já está morto.");
 			
 			return;
 		}
@@ -508,6 +565,7 @@ class Player
 		
 		Game.broadcast(String.format("%s levou um tiro e morreu.", username));
 		Game.unicast(this, "Você levou um tiro e morreu.");
+		Game.unicast(this, "Você foi desconectado.");
 		Game.removePlayer(this);
 		
 		try

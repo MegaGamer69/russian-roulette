@@ -9,7 +9,7 @@ public class GameClient
 	
 	public static class UpdateManager
 	{
-		public static final String CURRENT_VERSION = "JRR-v1.0.2-P2";
+		public static final String CURRENT_VERSION = "JRR-v1.0.3";
 		public static final String REPO_URL = "https://api.github.com/repos/MegaGamer69/russian-roulette/releases/latest";
 		
 		public static void checkByUpdates()
@@ -48,13 +48,16 @@ public class GameClient
 				{
 					System.out.println("// OKAY: Seu jogo está atualizado!.");
 				}
-				else if(versionSufix.equals("-B"))
-				{
-					System.out.println("// ATENÇÃO: Nova versão beta: " + latestVersion + ".");
-				}
 				else
 				{
-					System.out.println("// ATENÇÃO: Nova versão estável: " + latestVersion + ".");
+					if(versionSufix.equals("-B"))
+					{
+						System.out.println("// ATENÇÃO: Nova versão beta: " + latestVersion + ".");
+					}
+					else
+					{
+						System.out.println("// ATENÇÃO: Nova versão estável: " + latestVersion + ".");
+					}
 				}
 				
 				reader.close();
