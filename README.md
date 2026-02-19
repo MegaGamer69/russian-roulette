@@ -48,10 +48,10 @@ To Cheat the next revolver bullet (the next one after the current), and again, y
 You can build from source by running simply:
 
 ```sh
-javac ./*.java
+javac -cp ".:json-java.jar" *.java && jar cfm bin/Server.jar ./MANIFEST_Server.txt Game.class 'Game$ClientHandler.class' Player.class Revolver.class && jar cfm bin/Client.jar ./MANIFEST_Client.txt GameClient.class 'GameClient$1.class' 'GameClient$UpdateManager.class'
 ```
 
-Or run this unique bash script (i forgot to create the Batch File version):
+Or run this unique bash script (I need to create the Batch File version):
 
 ```
 ./build.sh
