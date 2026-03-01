@@ -9,7 +9,7 @@ public class GameClient
 	
 	public static class UpdateManager
 	{
-		public static final String CURRENT_VERSION = "JRR-v1.0.3";
+		public static final String CURRENT_VERSION = "JRR-v1.0.4";
 		public static final String REPO_URL = "https://api.github.com/repos/MegaGamer69/russian-roulette/releases/latest";
 		
 		public static void checkByUpdates()
@@ -155,7 +155,7 @@ public class GameClient
 						{
 							ipAddress = ip;
 							
-							System.out.println(String.format("Endereço LAN de conexão detectado (IPv4: %s)!", ipAddress));
+							System.out.println(String.format("Endereço LAN de conexão detectado (IP: %s)!", ipAddress));
 							
 							return;
 						}
