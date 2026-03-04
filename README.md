@@ -1,9 +1,9 @@
 # Java Russian Roulette (JRR)
-A multiplayer game compatible with JDK 7.0 made by me!
+A multiplayer game compatible with JDK 21.0 made by me!
 
 ### Requirements
-1. Java JRE 7.0 or above ([link](https://www.oracle.com/java/technologies/downloads/));
-2. LAN/VPN server service (e.g.: Hamachi or Radmin VPN);
+1. Java JRE 21.0 or above ([link](https://www.oracle.com/java/technologies/downloads/));
+2. LAN/VPN server service (e.g.: ZeroTier One, Hamachi or Radmin VPN);
 
 ### How 2 Start A Match?
 Start your server on the LAN service (untested).
@@ -20,10 +20,10 @@ Fire with the revolver (if you are with it):
 /Fire <target username here>
 ```
 
-To pass the revolver to other player (you need to have the revolver!!!):
+To pass the revolver to other round (you need to have the revolver!!!):
 
 ```
-/Pass <player username here>
+/Pass
 ```
 
 To send a unmoderated message on the chat:
@@ -51,7 +51,7 @@ You can build from source by running simply:
 javac ./*.java
 ```
 
-Or run this unique bash script (i forgot to create the Batch File version):
+Or run this unique bash script (I forgot to create the Batch File version):
 
 ```
 ./build.sh
